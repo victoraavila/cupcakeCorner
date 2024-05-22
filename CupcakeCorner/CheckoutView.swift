@@ -19,6 +19,7 @@ struct CheckoutView: View {
     
     @State private var confirmationMessage = ""
     @State private var showingConfirmation = false
+    @State private var connectionFailed = false
     
     var body: some View {
         ScrollView {
@@ -60,6 +61,11 @@ struct CheckoutView: View {
         } message: {
             Text(confirmationMessage)
         }
+        .alert("Oops!", isPresented: $connectionFailed) {
+            Button("OK") { }
+        } message: {
+            Text("The connection to the server failed. You may be having a poor internet connection.")
+        }
     }
     
     // The URLSession class makes it easy to send and receive data
@@ -87,6 +93,8 @@ struct CheckoutView: View {
             // Uploading it, looking for errors and ready to go to sleep while it happens
             let (data, _) = try await URLSession.shared.upload(for: request, from: encoded)
             
+            connectionFailed = false
+            
             // Handle the result
             // We'll show an alert with some details of the order we sent (by using the decoded version of the order, not the original order). Both should be the same, and if they aren't there was an error.
             let decodedOrder = try JSONDecoder().decode(Order.self, from: data)
@@ -100,6 +108,7 @@ struct CheckoutView: View {
         } catch {
             // If there is no Internet connection, or reqres.in is down or whatever
             print("Check out failed: \(error.localizedDescription)")
+            connectionFailed = true
         }
     }
     
