@@ -23,6 +23,48 @@ class Order: Codable {
         case _zip = "zip"
     }
     
+    init() {
+        if let savedName = UserDefaults.standard.data(forKey: "name") {
+            if let decodedName = try? JSONDecoder().decode(String.self, from: savedName) {
+                name = decodedName
+            } else {
+                name = ""
+            }
+        } else {
+            name = ""
+        }
+        
+        if let savedStreetAddress = UserDefaults.standard.data(forKey: "streetAddress") {
+            if let decodedStreetAddress = try? JSONDecoder().decode(String.self, from: savedStreetAddress) {
+                streetAddress = decodedStreetAddress
+            } else {
+                streetAddress = ""
+            }
+        } else {
+            streetAddress = ""
+        }
+        
+        if let savedCity = UserDefaults.standard.data(forKey: "city") {
+            if let decodedCity = try? JSONDecoder().decode(String.self, from: savedCity) {
+                city = decodedCity
+            } else {
+                city = ""
+            }
+        } else {
+            city = ""
+        }
+        
+        if let savedZip = UserDefaults.standard.data(forKey: "zip") {
+            if let decodedZip = try? JSONDecoder().decode(String.self, from: savedZip) {
+                zip = decodedZip
+            } else {
+                zip = ""
+            }
+        } else {
+            zip = ""
+        }
+    }
+    
     // We will use the .indices property of this Array as an arrayIndex. This is a bad idea with mutable Arrays, because the order of the Array can change at any type.
     static let types = ["Vanilla", "Strawberry", "Chocolate", "Rainbow"]
     
@@ -43,10 +85,34 @@ class Order: Codable {
     var addSprinkles = false
     
     // Fields that will be filled in by AddressView
-    var name = ""
-    var streetAddress = ""
-    var city = ""
-    var zip = ""
+    var name = "" {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(name) {
+                UserDefaults.standard.set(encoded, forKey: "name")
+            }
+        }
+    }
+    var streetAddress = "" {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(streetAddress) {
+                UserDefaults.standard.set(encoded, forKey: "streetAddress")
+            }
+        }
+    }
+    var city = "" {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(city) {
+                UserDefaults.standard.set(encoded, forKey: "city")
+            }
+        }
+    }
+    var zip = "" {
+        didSet {
+            if let encoded = try? JSONEncoder().encode(zip) {
+                UserDefaults.standard.set(encoded, forKey: "zip")
+            }
+        }
+    }
     
     // How to stop the user if they only filled in 3 out of the 4 fields?
     // Please, don't use length checks for the name, for example. They exclude people.
