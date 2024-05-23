@@ -9,7 +9,7 @@ import Foundation
 
 struct Address: Codable {
     var name: String
-    var streetAddress: String
+    var street: String
     var city: String
     var zip: String
 }
@@ -27,16 +27,15 @@ class Order: Codable {
         case _address = "address"
     }
     
+    // Read from UserDefaults, if it already exists
     init() {
         if let savedAdress = UserDefaults.standard.data(forKey: "address") {
             if let decodedAddress = try? JSONDecoder().decode(Address.self, from: savedAdress) {
                 address = decodedAddress
-            } else {
-                address = Address(name: "", streetAddress: "", city: "", zip: "")
+                return
             }
-        } else {
-            address = Address(name: "", streetAddress: "", city: "", zip: "")
         }
+        address = Address(name: "", street: "", city: "", zip: "")
     }
     
     // We will use the .indices property of this Array as an arrayIndex. This is a bad idea with mutable Arrays, because the order of the Array can change at any type.
@@ -59,7 +58,7 @@ class Order: Codable {
     var addSprinkles = false
     
     // Fields that will be filled in by AddressView
-    var address = Address(name: "", streetAddress: "", city: "", zip: "") {
+    var address = Address(name: "", street: "", city: "", zip: "") {
         didSet {
             if let encoded = try? JSONEncoder().encode(address) {
                 UserDefaults.standard.set(encoded, forKey: "address")
@@ -71,9 +70,9 @@ class Order: Codable {
     // Please, don't use length checks for the name, for example. They exclude people.
     // Let's just verify if name, street address, city and zip aren't empty. We'll combine this with SwiftUI .disabled() modifier to stop the user interaction if the condition is true.
     var hasValidAddress: Bool {
-        if address.name.isEmpty || address.streetAddress.isEmpty || address.city.isEmpty || address.zip.isEmpty {
+        if address.name.isEmpty || address.street.isEmpty || address.city.isEmpty || address.zip.isEmpty {
             return false
-        } else if address.name.trimmingCharacters(in: .whitespaces).isEmpty || address.streetAddress.trimmingCharacters(in: .whitespaces).isEmpty || address.city.trimmingCharacters(in: .whitespaces).isEmpty || address.zip.trimmingCharacters(in: .whitespaces).isEmpty {
+        } else if address.name.trimmingCharacters(in: .whitespaces).isEmpty || address.street.trimmingCharacters(in: .whitespaces).isEmpty || address.city.trimmingCharacters(in: .whitespaces).isEmpty || address.zip.trimmingCharacters(in: .whitespaces).isEmpty {
             return false
         }
         return true
