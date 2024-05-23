@@ -7,6 +7,13 @@
 
 import Foundation
 
+struct Address: Codable {
+    var name: String
+    var streetAddress: String
+    var city: String
+    var zip: String
+}
+
 @Observable
 class Order: Codable {
     // Mapping all names created by @Observable to the real keys (avoiding the _$observationRegistrar extra key)
@@ -17,51 +24,18 @@ class Order: Codable {
         case _specialRequestEnabled = "specialRequestEnabled"
         case _extraFrosting = "extraFrosting"
         case _addSprinkles = "addSprinkles"
-        case _name = "name"
-        case _city = "city"
-        case _streetAddress = "streetAddress"
-        case _zip = "zip"
+        case _address = "address"
     }
     
     init() {
-        if let savedName = UserDefaults.standard.data(forKey: "name") {
-            if let decodedName = try? JSONDecoder().decode(String.self, from: savedName) {
-                name = decodedName
+        if let savedAdress = UserDefaults.standard.data(forKey: "address") {
+            if let decodedAddress = try? JSONDecoder().decode(Address.self, from: savedAdress) {
+                address = decodedAddress
             } else {
-                name = ""
+                address = Address(name: "", streetAddress: "", city: "", zip: "")
             }
         } else {
-            name = ""
-        }
-        
-        if let savedStreetAddress = UserDefaults.standard.data(forKey: "streetAddress") {
-            if let decodedStreetAddress = try? JSONDecoder().decode(String.self, from: savedStreetAddress) {
-                streetAddress = decodedStreetAddress
-            } else {
-                streetAddress = ""
-            }
-        } else {
-            streetAddress = ""
-        }
-        
-        if let savedCity = UserDefaults.standard.data(forKey: "city") {
-            if let decodedCity = try? JSONDecoder().decode(String.self, from: savedCity) {
-                city = decodedCity
-            } else {
-                city = ""
-            }
-        } else {
-            city = ""
-        }
-        
-        if let savedZip = UserDefaults.standard.data(forKey: "zip") {
-            if let decodedZip = try? JSONDecoder().decode(String.self, from: savedZip) {
-                zip = decodedZip
-            } else {
-                zip = ""
-            }
-        } else {
-            zip = ""
+            address = Address(name: "", streetAddress: "", city: "", zip: "")
         }
     }
     
@@ -85,31 +59,10 @@ class Order: Codable {
     var addSprinkles = false
     
     // Fields that will be filled in by AddressView
-    var name = "" {
+    var address = Address(name: "", streetAddress: "", city: "", zip: "") {
         didSet {
-            if let encoded = try? JSONEncoder().encode(name) {
-                UserDefaults.standard.set(encoded, forKey: "name")
-            }
-        }
-    }
-    var streetAddress = "" {
-        didSet {
-            if let encoded = try? JSONEncoder().encode(streetAddress) {
-                UserDefaults.standard.set(encoded, forKey: "streetAddress")
-            }
-        }
-    }
-    var city = "" {
-        didSet {
-            if let encoded = try? JSONEncoder().encode(city) {
-                UserDefaults.standard.set(encoded, forKey: "city")
-            }
-        }
-    }
-    var zip = "" {
-        didSet {
-            if let encoded = try? JSONEncoder().encode(zip) {
-                UserDefaults.standard.set(encoded, forKey: "zip")
+            if let encoded = try? JSONEncoder().encode(address) {
+                UserDefaults.standard.set(encoded, forKey: "address")
             }
         }
     }
@@ -118,9 +71,9 @@ class Order: Codable {
     // Please, don't use length checks for the name, for example. They exclude people.
     // Let's just verify if name, street address, city and zip aren't empty. We'll combine this with SwiftUI .disabled() modifier to stop the user interaction if the condition is true.
     var hasValidAddress: Bool {
-        if name.isEmpty || streetAddress.isEmpty || city.isEmpty || zip.isEmpty {
+        if address.name.isEmpty || address.streetAddress.isEmpty || address.city.isEmpty || address.zip.isEmpty {
             return false
-        } else if name.trimmingCharacters(in: .whitespaces).isEmpty || streetAddress.trimmingCharacters(in: .whitespaces).isEmpty || city.trimmingCharacters(in: .whitespaces).isEmpty || zip.trimmingCharacters(in: .whitespaces).isEmpty {
+        } else if address.name.trimmingCharacters(in: .whitespaces).isEmpty || address.streetAddress.trimmingCharacters(in: .whitespaces).isEmpty || address.city.trimmingCharacters(in: .whitespaces).isEmpty || address.zip.trimmingCharacters(in: .whitespaces).isEmpty {
             return false
         }
         return true

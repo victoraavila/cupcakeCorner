@@ -22,10 +22,10 @@ struct AddressView: View {
         Form {
             Section {
                 // This data will persist even if we leave this View and come back, because we are passing around the same class instance (if we had used structs or local data with @State we would lost it if we did that)
-                TextField("Name", text: $order.name)
-                TextField("Street Address", text: $order.streetAddress)
-                TextField("City", text: $order.city)
-                TextField("Zip", text: $order.zip)
+                TextField("Name", text: $order.address.name)
+                TextField("Street Address", text: $order.address.streetAddress)
+                TextField("City", text: $order.address.city)
+                TextField("Zip", text: $order.address.zip)
             }
             
             Section {
