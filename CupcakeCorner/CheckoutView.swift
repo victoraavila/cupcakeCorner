@@ -33,6 +33,7 @@ struct CheckoutView: View {
                     ProgressView()
                 }
                 .frame(height: 233) // Chosen by try and error
+                .accessibilityHidden(true) // So both AsyncImage and ProgressView aren't read out by VoiceOver
                 
                 // It's important to define the order price format carefully below
                 Text("Your total cost is \(order.cost, format: .currency(code: "USD"))") // This will take care of inserting the Dollar sign, the correct comma/point and the correct number of decimal places
